@@ -1,9 +1,8 @@
-# glew
-glew sample / clang++ / msys 
-
 1 glewダウンロード
-  http://glew.sourceforge.net/
-  GLEW 2.1.0 adds support for OpenGL 4.6
+  https://www.opengl.org/sdk/libs/GLEW/
+  GLEW 2.1.0 adds support for OpenGL 4.6 (2020/2/22)
   c:\glew-2.1.0
 
-2 makefileのバージョンを更新
+2 makefileのバージョンを合わせる
+
+3 コンパイル
