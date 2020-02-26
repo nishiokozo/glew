@@ -1,35 +1,12 @@
 #include <windows.h>
-//#include <GL/gl.h>
-//  #include <windows.h>
-  #include <stdio.h>
-  #include <GL/glew.h>
-  #include <GL/wglew.h>
-//  #include <AL/al.h>
-//  #include <AL/alut.h>
+#include <stdio.h>
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
+#include "win.h"
 
 
-//------------------------------------------------------------------------------
-LRESULT CALLBACK WndProc
-//------------------------------------------------------------------------------
-(
-	  HWND	m_hWnd
-	, UINT	uMsg
-	, WPARAM wParam
-	, LPARAM lParam
-)
-{
-	switch( uMsg ) 
-	{
-	case WM_CREATE:
-			break;
-
-	case WM_DESTROY:
-		PostQuitMessage( 0 );
-		break;
-	}
-
-	return DefWindowProc( m_hWnd, uMsg, wParam, lParam );
-}
+static HGLRC	g_hGLRC;
 
 //------------------------------------------------------------------------------
 void EnableOpenGL(HWND m_hWnd, HDC * pHDC, HGLRC * hGLRC)
@@ -72,7 +49,7 @@ void EnableOpenGL(HWND m_hWnd, HDC * pHDC, HGLRC * hGLRC)
 }
 
 //------------------------------------------------------------------------------
-void DisableOpenGL(HWND m_hWnd, HDC hDC, HGLRC hGLRC)
+void DisableOpenGL(HWND m_hWnd, HDC hDC, HGLRC hGLRC )
 //------------------------------------------------------------------------------
 {
 	wglMakeCurrent( NULL, NULL );
@@ -81,107 +58,7 @@ void DisableOpenGL(HWND m_hWnd, HDC hDC, HGLRC hGLRC)
 
 }
 
-class	Win
-{
-	public:
-	boolean	m_bError;
-	HWND	m_hWnd;
-	HDC		m_hDC;
-	HGLRC	m_hGLRC;
 
-//------------------------------------------------------------------------------
-Win( int width, int height )
-//------------------------------------------------------------------------------
-{
-	HINSTANCE	hInstance;
-	hInstance	 = GetModuleHandle( NULL );
-
-	WNDCLASSEX wc;
-	wc.cbSize			= sizeof( WNDCLASSEX );
-	wc.style			= CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc		= WndProc;
-	wc.cbClsExtra		= 0;
-	wc.cbWndExtra		= 0;
-	wc.hInstance		= hInstance;  
-	wc.hIcon			= LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor			= LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground 	= (HBRUSH)( COLOR_WINDOW + 1 );
-	wc.lpszMenuName  	= MAKEINTRESOURCE( NULL );
-	wc.lpszClassName 	= "MainWindowClass";
-	wc.hIconSm			= NULL;
-
-	if ( 0 == RegisterClassEx( &wc ) ) 
-	{
-		m_bError = true;
-	}
-	else
-	{
-		m_hWnd = CreateWindowEx (
-			  WS_EX_APPWINDOW
-			, wc.lpszClassName
-			, "yukizo " __DATE__
-			, WS_OVERLAPPEDWINDOW
-			, CW_USEDEFAULT
-			, CW_USEDEFAULT
-			, width
-			, height
-			, NULL
-			, NULL
-			, hInstance
-			, 0
-		);
-
-		EnableOpenGL( m_hWnd, &m_hDC, &m_hGLRC );
-
-
-		ShowWindow (m_hWnd, SW_NORMAL);
-	}
-}
-
-//------------------------------------------------------------------------------
-~Win()
-//------------------------------------------------------------------------------
-{
-	DisableOpenGL( m_hWnd, m_hDC, m_hGLRC );
-
-	DestroyWindow( m_hWnd );
-}
-
-//------------------------------------------------------------------------------
-boolean	 update()
-//------------------------------------------------------------------------------
-{
-	int	flgLoop = false;
-
-	while (true)
-	{
-		MSG	msg;
-		if (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE) )
-		{
-			if (msg.message == WM_QUIT)
-			{
-				flgLoop = false;
-				break;
-			}
-			else
-			{
-				TranslateMessage( &msg );
-				DispatchMessage(&msg);
-			}
-		}
-		else
-		{
-			SwapBuffers( m_hDC );
-
-			flgLoop = true;
-			break;
-		}
-	}
-
-	return	flgLoop;	
-}
-
-};
 
 
 
@@ -279,6 +156,9 @@ int main()
 //------------------------------------------------------------------------------
 {
 	Win win(612,512);
+
+	EnableOpenGL( win.m_hWnd, &win.m_hDC, &g_hGLRC );
+
 
 	int		m_cntIndex;
 	float	m_matProjection[16]; 
@@ -505,6 +385,8 @@ int main()
 		glDrawElements( GL_TRIANGLE_STRIP, m_cntIndex, GL_UNSIGNED_INT, 0 );
 
 	}
+
+	DisableOpenGL( win.m_hWnd, win.m_hDC, g_hGLRC );
 
 	return( 0 );
 }
