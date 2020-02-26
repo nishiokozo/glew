@@ -3,7 +3,8 @@ OBJS   = main.o win.o
 GLEW	= C:\glew-2.1.0
 
 LIBS	=	-mwindows -mconsole -lopengl32 -lglu32  -static-libgcc -static-libstdc++ \
-			-L$(GLEW)/lib\Release/x64 -lglew32 -mwin32
+			-lglew32 -mwin32 \
+			-L$(GLEW)/lib\Release/x64 \
 
 INCS	=	-Wall -Wno-unused-but-set-variable \
 			-Ic:/msys64 \
